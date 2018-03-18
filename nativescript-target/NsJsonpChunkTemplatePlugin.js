@@ -11,8 +11,8 @@ module.exports = JsonpChunkTemplatePlugin;
 JsonpChunkTemplatePlugin.prototype.apply = function (chunkTemplate) {
 
 	//JSONP version
-	chunkTemplate.plugin("render", function (modules, chunk) {
-		var jsonpFunction = this.outputOptions.jsonpFunction;
+	chunkTemplate.hooks.render.tap("JsonpChunkTemplatePlugin", (modules, chunk) => {
+		var jsonpFunction = chunkTemplate.outputOptions.jsonpFunction;
 		var source = new ConcatSource();
 		source.add(jsonpFunction + "(" + JSON.stringify(chunk.ids) + ",");
 		source.add(modules);
@@ -25,10 +25,10 @@ JsonpChunkTemplatePlugin.prototype.apply = function (chunkTemplate) {
 		source.add(")");
 		return source;
 	});
-	chunkTemplate.plugin("hash", function (hash) {
+	chunkTemplate.hooks.hash.tap("JsonpChunkTemplatePlugin", hash => {
 		hash.update("JsonpChunkTemplatePlugin");
 		hash.update("3");
-		hash.update(this.outputOptions.jsonpFunction + "");
-		hash.update(this.outputOptions.library + "");
+		hash.update(chunkTemplate.outputOptions.jsonpFunction + "");
+		hash.update(chunkTemplate.outputOptions.library + "");
 	});
 };
