@@ -22,8 +22,6 @@ exports.NativeScriptSnapshotPlugin = (function() {
                     this.options.webpackConfig.entry instanceof Array)
                     this.options.webpackConfig.entry = { bundle: this.options.webpackConfig.entry };
             }
-
-            this.options.webpackConfig.entry["tns-java-classes"] = this.getTnsJavaClassesBuildPath();
         }
     }
 
@@ -43,10 +41,6 @@ exports.NativeScriptSnapshotPlugin = (function() {
     // inherit ProjectSnapshotGenerator
     NativeScriptSnapshotPlugin.prototype = Object.create(ProjectSnapshotGenerator.prototype);
     NativeScriptSnapshotPlugin.prototype.constructor = NativeScriptSnapshotPlugin;
-
-    NativeScriptSnapshotPlugin.prototype.getTnsJavaClassesBuildPath = function () {
-        return resolve(this.getBuildPath(), "../tns-java-classes.js");
-    }
 
     NativeScriptSnapshotPlugin.prototype.generate = function (webpackChunk) {
         const options = this.options;
@@ -75,13 +69,6 @@ exports.NativeScriptSnapshotPlugin = (function() {
 
     NativeScriptSnapshotPlugin.prototype.apply = function (compiler) {
         const options = this.options;
-
-        // Generate tns-java-classes.js file
-        debugger;
-        ProjectSnapshotGenerator.prototype.generateTnsJavaClassesFile.call(this, {
-            output: this.getTnsJavaClassesBuildPath(),
-            options: options.tnsJavaClassesOptions
-        });
 
         // Generate snapshots
         compiler.plugin("after-emit", function (compilation, callback) {
