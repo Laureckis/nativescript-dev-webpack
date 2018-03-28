@@ -60,6 +60,29 @@ export class NativeScriptAngularCompilerPlugin extends AngularCompilerPlugin {
                 resolved = resolved && resolved.replace(/\\/g, "/");
                 return resolved;
             };
+            this.__compilerHost.readFile = function (fileName) {
+                const original = fileName;
+                if (platform) {
+                    const parsed = path.parse(fileName);
+                    const platformFile = parsed.dir + "/" + parsed.name + "." + platform + parsed.ext;
+                    if (this.fileExists(platformFile, true)) {
+                        fileName = platformFile;
+                    }
+                }
+                fileName = this.resolve(fileName);
+                const stats = this._files[fileName];
+                if (stats == null) {
+                    const result = this._delegate.readFile(fileName);
+                    if (result !== undefined && this._cache) {
+                        this._setFileContent(original, result);
+                        return result;
+                    }
+                    else {
+                        return result;
+                    }
+                }
+                return stats.content;
+            }
         }
     }
 
